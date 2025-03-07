@@ -3,6 +3,7 @@
 .venv/
 __pycache__/
 data/
+option_fin_report_date/
 option_headers/
 option_percentiles/
 options/

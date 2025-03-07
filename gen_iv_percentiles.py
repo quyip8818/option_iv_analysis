@@ -5,7 +5,7 @@ import pandas as pd
 
 from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders
 
-percentiles = np.arange(0.1, 1.0, 0.1)
+percentiles = np.arange(0.01, 1.0, 0.01)
 
 
 def get_iv_ranges():
@@ -45,10 +45,10 @@ def get_all_iv_ranges_by_header():
         median = df.median(axis=1)
         means[header] = mean
         medians[header] = median
-        df.insert(0, 'Avg', mean)
-        df.insert(0, 'Medium', median)
+        df.insert(0, 'avg', mean)
+        df.insert(0, 'medium', median)
         df = df.rename_axis('percentiles')
-        resort_df = df.T.rename_axis('symbol')
+        resort_df = df.rename_axis('percentiles')
         resort_df.to_csv(f'option_headers/{header}.csv', index=True)
 
     means_df = pd.DataFrame(means)
@@ -63,4 +63,4 @@ def get_all_iv_ranges_by_header():
 
 
 
-get_all_iv_ranges_by_header()
+get_iv_ranges()
