@@ -1,6 +1,6 @@
 import pandas as pd
 
-df = pd.read_csv('data/OptionHistory2.csv')
+df = pd.read_csv('data/OptionHistory.csv')
 symbols = df['ticker'].unique()
 symbols = [s for s in symbols if isinstance(s, str)]
 symbols.sort()
