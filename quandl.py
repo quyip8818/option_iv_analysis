@@ -42,10 +42,10 @@ def find_percentiles(df, header):
     return pd.DataFrame(pd.Series(symbol_ranks).astype(int), columns=[header])
 
 
-def process_date(date):
+def fetch_option_quantiles(date):
     date_str = date.strftime("%Y-%m-%d")
     url = get_url(date_str)
-    file_name = f'raw_daily/option_{date.strftime("%Y_%m_%d")}.csv'
+    file_name = f'raw_iv/iv_{date.strftime("%Y_%m_%d")}.csv'
     # download_file(url, file_name)
     df = pd.read_csv(file_name)
     df = df[df['date'] == date_str]
@@ -65,4 +65,4 @@ def process_date(date):
 today = datetime.date(2025, 3, 6)
 # today = datetime.date.today()
 
-process_date(today)
+fetch_option_quantiles(today)
