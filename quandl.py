@@ -46,7 +46,7 @@ def process_date(date):
     date_str = date.strftime("%Y-%m-%d")
     url = get_url(date_str)
     file_name = f'raw_daily/option_{date.strftime("%Y_%m_%d")}.csv'
-    download_file(url, file_name)
+    # download_file(url, file_name)
     df = pd.read_csv(file_name)
     df = df[df['date'] == date_str]
     df.set_index('ticker', inplace=True)
@@ -56,8 +56,9 @@ def process_date(date):
     for header in IvMeanHeaders + IvCallHeaders + IvPutHeaders:
         dfs.append(find_percentiles(df, header))
     all_df = pd.concat(dfs, axis=1)
-    all_df.sort_index(inplace=True)
+    all_df.dropna(subset=['ivmean10', 'ivmean720'], inplace=True)
     all_df.rename_axis('symbol', inplace=True)
+    all_df.sort_index(inplace=True)
     all_df.to_csv(f'percentile_daily/option_{date.strftime("%Y_%m_%d")}.csv', index=True)
 
 
