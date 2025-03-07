@@ -2,9 +2,12 @@
 .idea/
 .venv/
 __pycache__/
+raw_daily/
 data/
 option_fin_report_date/
 option_headers/
 option_percentiles/
 options/
+percentile_daily/
+raw_daily/
 raw/
