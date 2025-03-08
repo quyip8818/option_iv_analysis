@@ -1,5 +1,7 @@
 TopHeaders = ['date', 'next_report_days', 'pass_report_days']
 
+DayRanges = [10, 20, 30, 60, 90, 120, 150, 180]
+
 HvHeaders = ['hv10', 'hv20', 'hv30', 'hv60', 'hv90', 'hv120', 'hv150', 'hv180']
 
 PhvHeaders = ['phv10', 'phv20', 'phv30', 'phv60', 'phv90', 'phv120', 'phv150', 'phv180']

@@ -1,8 +1,10 @@
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 
-from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders, TopHeaders
-from utils import get_symbols_from_folders, get_percentile_rank
+from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders, TopHeaders, DayRanges
+from utils import get_symbols_from_folders, get_percentile_rank, get_future_hv
 
 percentiles = np.arange(0.01, 1.0, 0.01)
 
@@ -71,10 +73,18 @@ def percentile_options():
         percentile_df.set_index('percentiles', inplace=True)
         option_df = pd.read_csv(f'options/{symbol}.csv')
         option_df = option_df[TopHeaders + IV_HEADERS]
+        option_df['date'] = pd.to_datetime(option_df['date'])
+        option_df.set_index('date', inplace=True)
+        option_df.sort_index(inplace=True)
         for header in IV_HEADERS:
-            option_df[header] = option_df.apply(lambda row: get_percentile_rank(row[header], percentile_df[header]), axis=1)
-        option_df.sort_values(by='date', ascending=True, inplace=True)
-        option_df.to_csv(f'option_percentiled/{symbol}.csv', index=False)
+            option_df[f'{header}_rank'] = option_df.apply(lambda row: get_percentile_rank(row[header], percentile_df[header]), axis=1)
+        for dayRange in DayRanges:
+            option_df[f'fv{dayRange}'] = option_df.apply(lambda row: get_future_hv(row.name, dayRange, option_df[f'hv{dayRange}']), axis=1)
+        for dayRange in DayRanges:
+            option_df[f'dif_v{dayRange}'] = option_df[f'ivmean{dayRange}'] - option_df[f'fv{dayRange}']
+
+        option_df.to_csv(f'option_percentiled/{symbol}.csv', index=True)
+        break
 
 
 percentile_options()
