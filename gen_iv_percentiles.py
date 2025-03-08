@@ -62,7 +62,7 @@ def get_all_iv_ranges_by_header():
 
 
 
-def percentile_option():
+def percentile_options():
     symbols = get_symbols_from_folders('option_percentiles')
     IV_HEADERS = HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders
     for symbol in symbols:
@@ -74,7 +74,7 @@ def percentile_option():
         for header in IV_HEADERS:
             option_df[header] = option_df.apply(lambda row: get_percentile_rank(row[header], percentile_df[header]), axis=1)
         option_df.sort_values(by='date', ascending=True, inplace=True)
-        option_df.to_csv(f'option_percentiled/{symbol}_options.csv', index=False)
+        option_df.to_csv(f'option_percentiled/{symbol}.csv', index=False)
 
 
-percentile_option()
+percentile_options()
