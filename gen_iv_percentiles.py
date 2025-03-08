@@ -1,36 +1,33 @@
-import os
-
 import numpy as np
 import pandas as pd
 
-from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders
+from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders, TopHeaders
+from utils import get_symbols_from_folders, get_percentile_rank
 
 percentiles = np.arange(0.01, 1.0, 0.01)
 
 
 def get_iv_ranges():
-    for file_name in os.listdir('options'):
-        symbol = file_name.replace('.csv', '')
-        if len(symbol) >= 5:
-            continue
+    for symbol in get_symbols_from_folders('options'):
         print(symbol)
         df = pd.read_csv(f'options/{symbol}.csv')
-        percentiles_df = df[HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders].quantile(percentiles)
-        percentiles_df = percentiles_df.reset_index().rename(columns={'index': 'Percentile'})
-        percentiles_df.to_csv(f'option_percentiles/{symbol}.csv', index=False)
+        df = df[df['date'] >= '2015-01-01']
+        if len(df) >= 100:
+            percentiles_df = df[HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders].quantile(percentiles)
+            percentiles_df = percentiles_df.reset_index().rename(columns={'index': 'percentiles'})
+            percentiles_df.to_csv(f'option_percentiles/{symbol}.csv', index=False)
 
 
 def get_all_iv_ranges_by_header():
     all_headers = HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders
     percentiles_dfs = []
-    for file_name in sorted(os.listdir('options')):
-        symbol = file_name.replace('.csv', '')
-        if len(symbol) >= 5:
-            continue
+    for symbol in get_symbols_from_folders('options'):
         print(symbol)
         df = pd.read_csv(f'options/{symbol}.csv')
-        percentiles_df = df[all_headers].quantile(percentiles)
-        percentiles_dfs.append((symbol, percentiles_df))
+        df = df[df['date'] >= '2015-01-01']
+        if len(df) >= 100:
+            percentiles_df = df[all_headers].quantile(percentiles)
+            percentiles_dfs.append((symbol, percentiles_df))
 
     medians = {}
     means = {}
@@ -63,4 +60,21 @@ def get_all_iv_ranges_by_header():
 
 
 
-get_iv_ranges()
+
+
+def percentile_option():
+    symbols = get_symbols_from_folders('option_percentiles')
+    IV_HEADERS = HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders
+    for symbol in symbols:
+        print(symbol)
+        percentile_df = pd.read_csv(f'option_percentiles/{symbol}.csv')
+        percentile_df.set_index('percentiles', inplace=True)
+        option_df = pd.read_csv(f'options/{symbol}.csv')
+        option_df = option_df[TopHeaders + IV_HEADERS]
+        for header in IV_HEADERS:
+            option_df[header] = option_df.apply(lambda row: get_percentile_rank(row[header], percentile_df[header]), axis=1)
+        option_df.sort_values(by='date', ascending=True, inplace=True)
+        option_df.to_csv(f'option_percentiled/{symbol}_options.csv', index=False)
+
+
+percentile_option()

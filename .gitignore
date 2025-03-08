@@ -7,6 +7,7 @@ data/
 option_fin_report_date/
 option_headers/
 option_percentiles/
+option_percentiled/
 options/
 percentile_daily/
 raw_daily/
