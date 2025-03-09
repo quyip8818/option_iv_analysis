@@ -1,6 +1,6 @@
 import pandas as pd
 
-from option_header import IvMeanHeaders, HvHeaders, PhvHeaders, IvPutHeaders, IvCallHeaders, DiffVHeader
+from option_header import IvMeanHeaders, DiffVHeader
 from utils import get_symbols_from_folders
 
 OPTION_FOLDER = 'option_percentiled'
@@ -26,12 +26,13 @@ def read_all_options(group_by_day_name):
     return pd.concat(dfs, ignore_index=True)
 
 
-group_by_day_name = 'pass_report_days'
-all_df = read_all_options(group_by_day_name)
-grouped_df = all_df.groupby(group_by_day_name, as_index=False)
-median_df = grouped_df.median()
-median_df['count'] = grouped_df[group_by_day_name].count().values
-median_df[median_df[group_by_day_name] <= 90].to_csv(f'option_fin_rep_date/{group_by_day_name}_diff_median.csv', index=False)
+for header in IvMeanHeaders:
+    group_by_day_name = f'{header}_rank'
+    all_df = read_all_options(group_by_day_name)
+    grouped_df = all_df.groupby(group_by_day_name, as_index=False)
+    median_df = grouped_df.median()
+    median_df['count'] = grouped_df[group_by_day_name].count().values
+    median_df[median_df['count'] >= 10000].to_csv(f'option_iv_rank_analysis/{group_by_day_name}_diff_median.csv', index=False)
 
 # mean_df = grouped_df.mean()
 # mean_df['count'] = grouped_df[group_by_day_name].count().values
