@@ -18,3 +18,7 @@ IvMeanHeaders = ['ivmean10', 'ivmean20', 'ivmean30', 'ivmean60', 'ivmean90', 'iv
 IvMeanSkewHeaders = ['ivmeanskew10', 'ivmeanskew20', 'ivmeanskew30', 'ivmeanskew60', 'ivmeanskew90', 'ivmeanskew120',
                      'ivmeanskew150', 'ivmeanskew180', 'ivmeanskew270', 'ivmeanskew360', 'ivmeanskew720',
                      'ivmeanskew1080']
+
+FvHeader= ['fv10', 'fv20', 'fv30', 'fv60', 'fv90', 'fv120', 'fv150', 'fv180']
+
+DiffVHeader= ['dif_v10', 'dif_v20', 'dif_v30', 'dif_v60', 'dif_v90', 'dif_v120', 'dif_v150', 'dif_v180']

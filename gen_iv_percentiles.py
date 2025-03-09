@@ -84,7 +84,6 @@ def percentile_options():
             option_df[f'dif_v{dayRange}'] = option_df[f'ivmean{dayRange}'] - option_df[f'fv{dayRange}']
 
         option_df.to_csv(f'option_percentiled/{symbol}.csv', index=True)
-        break
 
 
 percentile_options()

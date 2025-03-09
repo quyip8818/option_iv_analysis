@@ -4,10 +4,11 @@
 __pycache__/
 raw_daily/
 data/
-option_fin_report_date/
+option_fin_rep_date/
 option_headers/
 option_percentiles/
 option_percentiled/
+option_percentiled2/
 options/
 percentile_daily/
 raw_daily/
