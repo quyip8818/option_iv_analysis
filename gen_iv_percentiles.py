@@ -1,5 +1,3 @@
-from datetime import datetime
-
 import numpy as np
 import pandas as pd
 
@@ -61,9 +59,6 @@ def get_all_iv_ranges_by_header():
     median_df.to_csv(f'option_headers/median.csv', index=True)
 
 
-
-
-
 def percentile_options():
     symbols = get_symbols_from_folders('option_percentiles')
     IV_HEADERS = HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders
@@ -82,7 +77,6 @@ def percentile_options():
             option_df[f'fv{dayRange}'] = option_df.apply(lambda row: get_future_hv(row.name, dayRange, option_df[f'hv{dayRange}']), axis=1)
         for dayRange in DayRanges:
             option_df[f'dif_v{dayRange}'] = option_df[f'ivmean{dayRange}'] - option_df[f'fv{dayRange}']
-
         option_df.to_csv(f'option_percentiled/{symbol}.csv', index=True)
 
 

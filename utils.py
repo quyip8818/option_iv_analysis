@@ -12,7 +12,9 @@ def get_symbols_from_folders(folder):
 
 
 def get_percentile(value, percentiles: pd.Series):
-    index = np.searchsorted(percentiles.values, value, side="right")
+    if value < percentiles.iloc[0]:
+        return 0
+    index = np.searchsorted(percentiles.values, value, side="left")
     return percentiles.index[index] if index < len(percentiles) else 1
 
 
@@ -26,9 +28,10 @@ def get_next_date_str(date_str, day_diff):
     return new_date.strftime("%Y-%m-%d")
 
 
-def get_future_hv(date, next_days, hv_df):
+def get_future_hv(date, next_days, hvs: pd.Series):
     next_date = date + timedelta(days=next_days)
-    last_date = hv_df.index[-1]
-    if next_date > last_date:
+    idx = np.searchsorted(hvs.index, next_date, side='left')
+    if idx >= len(hvs):
         return None
-    return hv_df.asof(next_date)
+    return hvs.iloc[idx]
+
