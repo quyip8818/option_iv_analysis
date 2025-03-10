@@ -28,10 +28,16 @@ def get_next_date_str(date_str, day_diff):
     return new_date.strftime("%Y-%m-%d")
 
 
+def get_date_value(date: pd.DatetimeIndex, values: pd.Series):
+    idx = np.searchsorted(values.index, date, side='left')
+    if idx < 0 or idx >= len(values):
+        return None
+    day_diff = (values.index[idx] - date).days
+    if abs(day_diff) >= 3:
+        return None
+    return values.iloc[idx]
+
+
 def get_future_hv(date, next_days, hvs: pd.Series):
     next_date = date + timedelta(days=next_days)
-    idx = np.searchsorted(hvs.index, next_date, side='left')
-    if idx >= len(hvs):
-        return None
-    return hvs.iloc[idx]
-
+    return get_date_value(next_date, hvs)
