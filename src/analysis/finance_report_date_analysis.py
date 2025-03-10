@@ -1,7 +1,7 @@
 import pandas as pd
 
-from option_header import IvMeanHeaders, HvHeaders, PhvHeaders, IvPutHeaders, IvCallHeaders, DiffVHeader
-from utils import get_symbols_from_folders
+from src.processor.option_header import DiffVHeader
+from src.utils.utils import get_symbols_from_folders
 
 OPTION_FOLDER = 'option_percentiled'
 

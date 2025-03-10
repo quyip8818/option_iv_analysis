@@ -17,7 +17,7 @@ def process_date(date_str):
 
 
 def get_finance_report_date():
-    df = pd.read_csv('raw/financeReportDate.csv')
+    df = pd.read_csv('../../raw/financeReportDate.csv')
     reports = {}
     for row in df.itertuples(index=False):
         symbol = row.Symbol
@@ -55,7 +55,7 @@ def from_pass_report_days(symbol, date_str):
     return None
 
 def merge_next_report_date():
-    df = pd.read_csv('raw/OptionHistory.csv')
+    df = pd.read_csv('../../raw/OptionHistory.csv')
     next_report_days = df.apply(lambda row: to_next_report_days(row['ticker'], row['date']), axis=1)
     pass_report_days = df.apply(lambda row: from_pass_report_days(row['ticker'], row['date']), axis=1)
     df.insert(2, "next_report_days", next_report_days)
