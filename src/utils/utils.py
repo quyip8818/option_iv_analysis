@@ -18,8 +18,10 @@ def get_percentile(value, percentiles: pd.Series):
     return percentiles.index[index] if index < len(percentiles) else 1
 
 
-def get_percentile_rank(value, percentiles):
-    return math.floor(get_percentile(value, percentiles) * 100)
+def get_percentile_rank(percentiles, value):
+    if not isinstance(value, float) or math.isnan(value):
+        return None
+    return math.floor(get_percentile(percentiles, value) * 100)
 
 
 def get_next_date_str(date_str, day_diff):

@@ -12,11 +12,11 @@ percentiles = np.arange(0.01, 1.0, 0.01)
 
 
 def percentiles_iv_by_symbols():
-    headers = list_csv_names(get_root_path(f'options/percentiles_headers'))
+    headers = list_csv_names(get_root_path(f'options/iv_percentiles_headers'))
     data_symbols = {}
     for header in headers:
         print(header)
-        df = pd.read_csv(get_root_path(f'options/percentiles_headers/{header}.csv'))
+        df = pd.read_csv(get_root_path(f'options/iv_percentiles_headers/{header}.csv'))
         for symbol in df.columns:
             if symbol not in data_symbols:
                 data_symbols[symbol] = {}
@@ -27,11 +27,11 @@ def percentiles_iv_by_symbols():
         df = pd.DataFrame(header_data)
         df = df[sorted(df.columns)]
         df.rename_axis('percentiles', inplace=True)
-        df.to_csv(get_root_path(f'options/percentiles_symbols/{symbol}.csv'), index=True)
+        df.to_csv(get_root_path(f'options/iv_percentiles_symbols/{symbol}.csv'), index=True)
 
 
 def get_all_iv_ranges_by_header():
-    exist_headers = list_csv_names(get_root_path(f'options/percentiles_headers'))
+    exist_headers = list_csv_names(get_root_path(f'options/iv_percentiles_headers'))
     all_headers = [h for h in (HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders) if h not in exist_headers]
 
     for header in all_headers:
@@ -54,7 +54,7 @@ def get_all_iv_ranges_by_header():
         df.insert(1, 'median', median)
         df.insert(2, 'mean', mean)
         df.rename_axis('percentiles', inplace=True)
-        df.to_csv(get_root_path(f'options/percentiles_headers/{header}.csv'), index=True)
+        df.to_csv(get_root_path(f'options/iv_percentiles_headers/{header}.csv'), index=True)
 
 
 def percentile_options():
