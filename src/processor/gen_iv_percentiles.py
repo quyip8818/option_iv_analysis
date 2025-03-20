@@ -1,62 +1,51 @@
 import numpy as np
 import pandas as pd
+from numpy.ma.extras import column_stack
 
 from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders, TopHeaders, DayRanges
+from src.utils.path_utils import get_root_path
 from src.utils.utils import get_symbols_from_folders, get_percentile_rank, get_future_hv
 
-percentiles = np.arange(0.01, 1.0, 0.01)
+# https://data.nasdaq.com/tables/VOL/QUANTCHA-VOL/export
+
+percentiles = np.arange(0.0, 1.0, 0.01)
 
 
-def get_iv_ranges():
-    for symbol in get_symbols_from_folders('options'):
+def percentiles_iv_by_symbols():
+    df = pd.read_csv(get_root_path(f'raw/IV_all.csv'), usecols=['ticker'] + HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders)
+    df.rename(columns={'ticker': 'symbol'}, inplace=True)
+    for symbol, symbol_df in df.groupby('symbol'):
         print(symbol)
-        df = pd.read_csv(f'options/{symbol}.csv')
-        df = df[df['date'] >= '2015-01-01']
-        if len(df) >= 100:
+        if len(symbol_df) >= 100:
             percentiles_df = df[HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders].quantile(percentiles)
             percentiles_df = percentiles_df.reset_index().rename(columns={'index': 'percentiles'})
-            percentiles_df.to_csv(f'option_percentiles/{symbol}.csv', index=False)
+            percentiles_df.to_csv(f'options/symbol_percentiles/{symbol}.csv', index=False)
 
 
 def get_all_iv_ranges_by_header():
     all_headers = HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders
-    percentiles_dfs = []
-    for symbol in get_symbols_from_folders('options'):
-        print(symbol)
-        df = pd.read_csv(f'options/{symbol}.csv')
-        df = df[df['date'] >= '2015-01-01']
-        if len(df) >= 100:
-            percentiles_df = df[all_headers].quantile(percentiles)
-            percentiles_dfs.append((symbol, percentiles_df))
-
-    medians = {}
-    means = {}
     for header in all_headers:
         print(header)
-        dfs = {}
-        for symbol, percentiles_df in percentiles_dfs:
-            dfs[symbol] = percentiles_df[header]
-        df = pd.DataFrame(dfs)
+        df = pd.read_csv(get_root_path(f'raw/IV_all.csv'), usecols=['ticker', header], nrows=10000)
+        df.dropna(inplace=True)
+        df.rename(columns={'ticker': 'symbol'}, inplace=True)
+        all_df = df[[header]].quantile(percentiles)
+
+        symbol_dfs = {}
+        for symbol, symbol_df in df.groupby('symbol'):
+            print(symbol)
+            if len(symbol_df) >= 2000:
+                tmp_df = df[[header]].quantile(percentiles)
+                symbol_dfs[symbol] = tmp_df[header]
+        df = pd.DataFrame(symbol_dfs)
         df = df[sorted(df.columns)]
         mean = df.mean(axis=1)
         median = df.median(axis=1)
-        means[header] = mean
-        medians[header] = median
-        df.insert(0, 'avg', mean)
-        df.insert(0, 'medium', median)
-        df = df.rename_axis('percentiles')
+        df.insert(0, 'all', all_df[header])
+        df.insert(1, 'median', median)
+        df.insert(2, 'mean', mean)
         resort_df = df.rename_axis('percentiles')
-        resort_df.to_csv(f'option_headers/{header}.csv', index=True)
-
-    means_df = pd.DataFrame(means)
-    means_df = means_df[sorted(means_df.columns)]
-    means_df = means_df.rename_axis('percentiles')
-    means_df.to_csv(f'option_headers/means.csv', index=True)
-
-    median_df = pd.DataFrame(medians)
-    median_df = median_df[sorted(median_df.columns)]
-    median_df = median_df.rename_axis('percentiles')
-    median_df.to_csv(f'option_headers/median.csv', index=True)
+        resort_df.to_csv(get_root_path(f'options/percentiles_headers/{header}.csv'), index=True)
 
 
 def percentile_options():
@@ -80,4 +69,5 @@ def percentile_options():
         option_df.to_csv(f'option_percentiled/{symbol}.csv', index=True)
 
 
-percentile_options()
+if __name__ == '__main__':
+    get_all_iv_ranges_by_header()
