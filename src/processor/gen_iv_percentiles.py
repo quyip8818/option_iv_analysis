@@ -12,14 +12,22 @@ percentiles = np.arange(0.01, 1.0, 0.01)
 
 
 def percentiles_iv_by_symbols():
-    df = pd.read_csv(get_root_path(f'raw/IV_all.csv'), usecols=['ticker'] + HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders)
-    df.rename(columns={'ticker': 'symbol'}, inplace=True)
-    for symbol, symbol_df in df.groupby('symbol'):
-        print(symbol)
-        if len(symbol_df) >= 100:
-            percentiles_df = df[HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders].quantile(percentiles)
-            percentiles_df = percentiles_df.reset_index().rename(columns={'index': 'percentiles'})
-            percentiles_df.to_csv(f'options/symbol_percentiles/{symbol}.csv', index=False)
+    headers = list_csv_names(get_root_path(f'options/percentiles_headers'))
+    data_symbols = {}
+    for header in headers:
+        print(header)
+        df = pd.read_csv(get_root_path(f'options/percentiles_headers/{header}.csv'))
+        for symbol in df.columns:
+            if symbol not in data_symbols:
+                data_symbols[symbol] = {}
+            symbol_headers = data_symbols[symbol]
+            symbol_headers[header] = df[symbol]
+
+    for symbol, header_data in data_symbols.items():
+        df = pd.DataFrame(header_data)
+        df = df[sorted(df.columns)]
+        df.rename_axis('percentiles', inplace=True)
+        df.to_csv(get_root_path(f'options/percentiles_symbols/{symbol}.csv'), index=True)
 
 
 def get_all_iv_ranges_by_header():
@@ -35,7 +43,6 @@ def get_all_iv_ranges_by_header():
 
         symbol_dfs = {}
         for symbol, symbol_df in df.groupby('symbol'):
-            print(symbol)
             if len(symbol_df) >= 2000:
                 tmp_df = symbol_df[[header]].quantile(percentiles)
                 symbol_dfs[symbol] = tmp_df[header]
@@ -46,8 +53,8 @@ def get_all_iv_ranges_by_header():
         df.insert(0, 'all', all_df[header])
         df.insert(1, 'median', median)
         df.insert(2, 'mean', mean)
-        resort_df = df.rename_axis('percentiles')
-        resort_df.to_csv(get_root_path(f'options/percentiles_headers/{header}.csv'), index=True)
+        df.rename_axis('percentiles', inplace=True)
+        df.to_csv(get_root_path(f'options/percentiles_headers/{header}.csv'), index=True)
 
 
 def percentile_options():
@@ -72,4 +79,4 @@ def percentile_options():
 
 
 if __name__ == '__main__':
-    get_all_iv_ranges_by_header()
+    percentiles_iv_by_symbols()
