@@ -3,12 +3,12 @@ import pandas as pd
 from numpy.ma.extras import column_stack
 
 from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders, TopHeaders, DayRanges
-from src.utils.path_utils import get_root_path
+from src.utils.path_utils import get_root_path, list_csv_names
 from src.utils.utils import get_symbols_from_folders, get_percentile_rank, get_future_hv
 
 # https://data.nasdaq.com/tables/VOL/QUANTCHA-VOL/export
 
-percentiles = np.arange(0.0, 1.0, 0.01)
+percentiles = np.arange(0.01, 1.0, 0.01)
 
 
 def percentiles_iv_by_symbols():
@@ -23,7 +23,9 @@ def percentiles_iv_by_symbols():
 
 
 def get_all_iv_ranges_by_header():
-    all_headers = HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders
+    exist_headers = list_csv_names(get_root_path(f'options/percentiles_headers'))
+    all_headers = [h for h in (HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders) if h not in exist_headers]
+
     for header in all_headers:
         print(header)
         df = pd.read_csv(get_root_path(f'raw/IV_all.csv'), usecols=['ticker', header])
@@ -35,7 +37,7 @@ def get_all_iv_ranges_by_header():
         for symbol, symbol_df in df.groupby('symbol'):
             print(symbol)
             if len(symbol_df) >= 2000:
-                tmp_df = df[[header]].quantile(percentiles)
+                tmp_df = symbol_df[[header]].quantile(percentiles)
                 symbol_dfs[symbol] = tmp_df[header]
         df = pd.DataFrame(symbol_dfs)
         df = df[sorted(df.columns)]

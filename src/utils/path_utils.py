@@ -12,3 +12,8 @@ def get_root_path(folder):
 
 def extract_file_name(path):
     return os.path.splitext(os.path.basename(path))[0]
+
+
+def list_csv_names(path):
+    files = os.listdir(path)
+    return sorted([extract_file_name(f) for f in files if f.endswith('.csv')])
