@@ -26,7 +26,7 @@ def get_all_iv_ranges_by_header():
     all_headers = HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders
     for header in all_headers:
         print(header)
-        df = pd.read_csv(get_root_path(f'raw/IV_all.csv'), usecols=['ticker', header], nrows=10000)
+        df = pd.read_csv(get_root_path(f'raw/IV_all.csv'), usecols=['ticker', header])
         df.dropna(inplace=True)
         df.rename(columns={'ticker': 'symbol'}, inplace=True)
         all_df = df[[header]].quantile(percentiles)
