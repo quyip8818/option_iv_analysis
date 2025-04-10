@@ -4,8 +4,9 @@ import numpy as np
 import pandas as pd
 
 from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders, TopHeaders, DayRanges
+from src.utils.idx_utils import get_percentile_rank
 from src.utils.path_utils import get_root_path, list_csv_names, get_data_path
-from src.utils.utils import get_symbols_from_folders, get_percentile_rank, get_future_hv
+from src.utils.utils import get_symbols_from_folders, get_future_hv
 
 # https://data.nasdaq.com/tables/VOL/QUANTCHA-VOL/export
 

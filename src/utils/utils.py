@@ -1,4 +1,3 @@
-import math
 import os
 
 import numpy as np
@@ -9,19 +8,6 @@ from datetime import datetime, timedelta
 def get_symbols_from_folders(folder):
     symbols = [file_name.replace('.csv', '') for file_name in os.listdir(folder) if file_name.endswith('.csv')]
     return sorted([s for s in symbols if len(s) <= 5])
-
-
-def get_percentile(value, percentiles: pd.Series):
-    if value < percentiles.iloc[0]:
-        return 0
-    index = np.searchsorted(percentiles.values, value, side="left")
-    return percentiles.index[index] if index < len(percentiles) else 1
-
-
-def get_percentile_rank(percentiles, value):
-    if not isinstance(value, float) or math.isnan(value):
-        return None
-    return math.floor(get_percentile(percentiles, value) * 100)
 
 
 def get_next_date_str(date_str, day_diff):
