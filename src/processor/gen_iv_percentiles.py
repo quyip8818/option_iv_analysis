@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -30,19 +32,21 @@ def percentiles_iv_by_symbols():
 
 
 def get_all_iv_ranges_by_header():
-    exist_headers = list_csv_names(get_data_path(f'iv_percentiles_headers'))
+    output_folder = get_data_path(f'iv_percentiles_headers')
+    os.makedirs(output_folder, exist_ok=True)
+    exist_headers = list_csv_names(output_folder)
     all_headers = [h for h in (HvHeaders + PhvHeaders + IvMeanHeaders + IvCallHeaders + IvPutHeaders) if h not in exist_headers]
 
     for header in all_headers:
         print(header)
-        df = pd.read_csv(get_root_path(f'raw/iv_all.csv'), usecols=['ticker', header])
+        df = pd.read_csv(get_data_path(f'iv_all.csv'), usecols=['ticker', header])
         df.dropna(inplace=True)
         df.rename(columns={'ticker': 'symbol'}, inplace=True)
         all_df = df[[header]].quantile(percentiles)
 
         symbol_dfs = {}
         for symbol, symbol_df in df.groupby('symbol'):
-            if len(symbol_df) >= 500:
+            if len(symbol_df) >= 1000:
                 tmp_df = symbol_df[[header]].quantile(percentiles)
                 symbol_dfs[symbol] = tmp_df[header]
         df = pd.DataFrame(symbol_dfs)
@@ -78,4 +82,4 @@ def percentile_options():
 
 
 if __name__ == '__main__':
-    percentiles_iv_by_symbols()
+    get_all_iv_ranges_by_header()
