@@ -5,7 +5,7 @@ import pandas as pd
 
 from option_header import HvHeaders, PhvHeaders, IvMeanHeaders, IvCallHeaders, IvPutHeaders, TopHeaders, DayRanges
 from src.utils.idx_utils import get_percentile_rank
-from src.utils.path_utils import get_root_path, list_csv_names, get_data_path
+from src.utils.path_utils import list_csv_names, get_data_path
 from src.utils.utils import get_symbols_from_folders, get_future_hv
 
 # https://data.nasdaq.com/tables/VOL/QUANTCHA-VOL/export
@@ -25,11 +25,13 @@ def percentiles_iv_by_symbols():
             symbol_headers = data_symbols[symbol]
             symbol_headers[header] = df[symbol]
 
+    output_folder = get_data_path(f'iv_percentiles_symbols')
+    os.makedirs(output_folder, exist_ok=True)
     for symbol, header_data in data_symbols.items():
         df = pd.DataFrame(header_data)
         df = df[sorted(df.columns)]
         df.rename_axis('percentiles', inplace=True)
-        df.to_csv(get_data_path(f'iv_percentiles_symbols/{symbol}.csv'), index=True)
+        df.to_csv(f'{output_folder}/{symbol}.csv', index=True)
 
 
 def get_all_iv_ranges_by_header():
@@ -47,7 +49,7 @@ def get_all_iv_ranges_by_header():
 
         symbol_dfs = {}
         for symbol, symbol_df in df.groupby('symbol'):
-            if len(symbol_df) >= 1000:
+            if len(symbol_df) >= 250:
                 tmp_df = symbol_df[[header]].quantile(percentiles)
                 symbol_dfs[symbol] = tmp_df[header]
         df = pd.DataFrame(symbol_dfs)
@@ -84,3 +86,4 @@ def percentile_options():
 
 if __name__ == '__main__':
     get_all_iv_ranges_by_header()
+    # percentiles_iv_by_symbols()
